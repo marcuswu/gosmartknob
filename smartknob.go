@@ -17,7 +17,7 @@ import (
 const (
 	protobufProtocolVersion = 1
 	retryMillis             = 250
-	baud                    = 921600
+	Baud                    = 921600
 	Ch340VendorId           = 0x1a86
 	Ch340ProductId          = 0x7523
 	Esp32s3VendorId         = 0x303a
