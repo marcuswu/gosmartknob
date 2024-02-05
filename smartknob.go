@@ -36,6 +36,7 @@ var DefaultDeviceFilters = []core.UsbFilter{
 }
 
 type MessageCallback func(message *pb.FromSmartKnob)
+type OnClosedCallback func()
 type SendBytes func(packet []uint8)
 
 type QueueEntry struct {
@@ -45,6 +46,7 @@ type QueueEntry struct {
 
 type SmartKnob struct {
 	onMessage     MessageCallback
+	onClosed      OnClosedCallback
 	connection    io.ReadWriteCloser
 	outgoingQueue []QueueEntry
 	lastNonce     uint32
@@ -53,9 +55,10 @@ type SmartKnob struct {
 	retry         *time.Timer
 }
 
-func New(connection io.ReadWriteCloser, onMessage MessageCallback) *SmartKnob {
+func New(connection io.ReadWriteCloser, onMessage MessageCallback, onClosed OnClosedCallback) *SmartKnob {
 	sk := &SmartKnob{
 		onMessage:     onMessage,
+		onClosed:      onClosed,
 		outgoingQueue: make([]QueueEntry, 0),
 		lastNonce:     uint32(rand.Int31()),
 		readRunning:   atomic.Bool{},
@@ -74,6 +77,7 @@ func (skc *SmartKnob) sendBytes(data []byte) {
 		if err != nil && (errors.Is(err, io.EOF) || errors.Is(err, io.ErrUnexpectedEOF)) {
 			skc.connection.Close()
 			skc.connection = nil
+			skc.onClosed()
 		}
 	}
 }
@@ -103,6 +107,7 @@ func (skc *SmartKnob) SetReadWriter(readWriter io.ReadWriteCloser) {
 			if err != nil && (errors.Is(err, io.EOF) || errors.Is(err, io.ErrUnexpectedEOF)) {
 				skc.connection.Close()
 				skc.connection = nil
+				skc.onClosed()
 				return
 			}
 		}
