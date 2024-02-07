@@ -1024,7 +1024,6 @@ func file_smartknob_proto_init() {
 	if File_smartknob_proto != nil {
 		return
 	}
-	file_nanopb_proto_init()
 	if !protoimpl.UnsafeEnabled {
 		file_smartknob_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*FromSmartKnob); i {
