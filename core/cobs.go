@@ -33,7 +33,7 @@ func CobsEncode(buf []byte) []byte {
 func CobsDecode(buf []byte) []byte {
 	dest := make([]byte, 0, len(buf))
 
-	for i := 0; i < len(buf); i++ {
+	for i := 0; i < len(buf); {
 		code := buf[i]
 		i++
 		var j byte
